@@ -1,25 +1,25 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useStore from "@/store/useStore";
 
-export default function Home() {
+export function useAuthGuard() {
   const token = useStore((state) => state.token);
   const loadToken = useStore((state) => state.loadToken);
   const router = useRouter();
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    loadToken();
+    loadToken();        
+    setChecked(true);  
   }, []);
 
   useEffect(() => {
-    if (token) {
-      router.push("/dashboard");
-    } else {
+    if (checked && !token) {
       router.push("/login");
     }
-  }, [token]);
+  }, [checked, token]);
 
-  return <p>Redirecting...</p>;
+    return { ready: checked && !!token };
 }
